@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>测试文档加载</title>
+</head>
+<body>
+  <h1>测试文档加载</h1>
+  <button onclick="loadDoc()">加载文档</button>
+  <div id="container" style="border:1px solid #ccc; padding:10px; min-height:100px;">
+    点击按钮加载文档...
+  </div>
+  <script>
+    async function loadDoc() {
+      const container = document.getElementById('container');
+      container.innerHTML = '<div class="loading">加载中...</div>';
+      console.log('1. 开始加载');
+      
+      try {
+        const response = await fetch('http://127.0.0.1:8080/api/documents/7');
+        const data = await response.json();
+        console.log('2. 获取数据成功, html_content长度:', data.html_content?.length);
+        
+        container.innerHTML = '<div class="doc-content">' + data.html_content + '</div>';
+        console.log('3. innerHTML设置完成');
+        console.log('container.innerHTML长度:', container.innerHTML.length);
+        console.log('container.firstChild:', container.firstChild);
+      } catch (e) {
+        console.error('加载失败:', e);
+        container.innerHTML = '<p style="color:red">加载失败</p>';
+      }
+    }
+  </script>
+</body>
+</html>

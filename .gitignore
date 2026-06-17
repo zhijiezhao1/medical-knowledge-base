@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.db
+*.db-journal
+*.log
+.DS_Store
+*.command
+启动知识库.sh
+ui_mockup_pc.html
+第一部分 重症监测与患者评估.docx
