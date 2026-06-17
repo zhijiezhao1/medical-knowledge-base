@@ -7,7 +7,7 @@
   console.log('app.js loaded v26');
 
   // ========== 配置 ==========
-  const API = 'http://127.0.0.1:8080/api';
+  const API = 'https://medical-production-84ec.up.railway.app/api';
   const DEBOUNCE_MS = 500;
   const MAX_FILE_SIZE = 50 * 1024 * 1024;
   const CORRECT_PASSWORD = 'zhishiku';
