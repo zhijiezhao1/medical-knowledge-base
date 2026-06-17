@@ -1,0 +1,11 @@
+[build]
+  builder = "NIXPACKS"
+  buildCommand = "pip install --no-cache-dir -r requirements.txt" if exists("requirements.txt") else ""
+
+[deploy]
+  restartPolicyType = "ON_FAILURE"
+  restartPolicyAmount = 10
+  startCommand = "bash start.sh"
+
+[variables]
+  PYTHONUNBUFFERED = "1"

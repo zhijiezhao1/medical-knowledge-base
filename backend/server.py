@@ -19,7 +19,7 @@ from database import (
 from doc_parser import parse_file
 
 # ========== 配置 ==========
-HOST = '127.0.0.1'
+HOST = '0.0.0.0'
 PORT = 8080
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend')
