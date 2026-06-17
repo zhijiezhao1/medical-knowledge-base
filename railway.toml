@@ -1,10 +1,7 @@
 [build]
-  builder = "NIXPACKS"
+  builder = "RAILPACK"
 
 [deploy]
   restartPolicyType = "ON_FAILURE"
-  restartPolicyAmount = 10
+  restartPolicyMaxRetries = 10
   startCommand = "bash start.sh"
-
-[variables]
-  PYTHONUNBUFFERED = "1"
