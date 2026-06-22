@@ -242,6 +242,7 @@
       const data = await api.getDoc(id);
       const html = data.html_content || '<p style="color:var(--text-muted)">文档内容为空</p>';
       container.innerHTML = '<div class="doc-body-content">' + html + '</div>';
+      console.log('[loadDocContent] activeSearchKeyword:', state.activeSearchKeyword, 'length:', state.activeSearchKeyword?.length);
       if (state.activeSearchKeyword) {
         highlightKeyword(container, state.activeSearchKeyword);
         const marks = container.querySelectorAll('mark.search-highlight');
