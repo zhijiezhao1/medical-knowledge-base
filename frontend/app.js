@@ -244,10 +244,14 @@
       container.innerHTML = '<div class="doc-body-content">' + html + '</div>';
       if (state.activeSearchKeyword) {
         highlightKeyword(container, state.activeSearchKeyword);
-        const marks = container.querySelectorAll('mark');
+        const marks = container.querySelectorAll('mark.search-highlight');
         state.totalMatches = marks.length;
         state.currentMatch = 0;
         addPositionControls(container, id);
+        // 初始定位到唯一的匹配项
+        if (state.totalMatches === 1) {
+          setTimeout(() => scrollToMatch(container, 0), 100);
+        }
       }
     } catch (e) {
       container.innerHTML = '<p style="color:var(--error)">加载失败</p>';
@@ -287,10 +291,7 @@
   function addPositionControls(container, docId) {
     const old = container.parentElement.querySelector('.position-controls');
     if (old) old.remove();
-    if (state.activeSearchKeyword && state.totalMatches <= 0) {
-      state.totalMatches = container.querySelectorAll('mark.search-highlight').length || 1;
-    }
-    if (state.totalMatches <= 0 && !state.activeSearchKeyword) return;
+    if (!state.activeSearchKeyword || state.totalMatches <= 0) return;
     const ctrl = document.createElement('div');
     ctrl.className = 'position-controls';
     ctrl.innerHTML = '<button class="position-btn" id="prevMatch">↑ 上一处 (' + Math.max(1, state.currentMatch) + '/' + state.totalMatches + ')</button>' +
@@ -302,7 +303,9 @@
 
   function scrollToMatch(container, dir) {
     const marks = container.querySelectorAll('mark.search-highlight');
-    if (marks.length === 0) return;
+    if (marks.length === 0 || state.totalMatches <= 0) return;
+    // 边界处理
+    if (dir !== 0 && state.totalMatches === 1) return; // 只有一个匹配时不响应上下翻页
     state.currentMatch = Math.max(0, Math.min(state.totalMatches - 1, state.currentMatch + dir));
     marks.forEach(m => m.classList.remove('focused'));
     if (marks[state.currentMatch]) {
