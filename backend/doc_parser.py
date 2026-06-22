@@ -145,6 +145,33 @@ def _get_run_style(run_elem):
         if fill and fill not in ('auto', 'transparent'):
             styles.append(f'background:#{fill}')
 
+    # 字体荧光笔高亮（highlight）
+    highlight_elem = rPr.find(f'{{{W}}}highlight')
+    if highlight_elem is not None:
+        val = highlight_elem.get(f'{{{W}}}val')
+        if val and val not in ('none', 'auto', 'clear'):
+            # 将Word颜色名转换为十六进制
+            color_map = {
+                'yellow': '#FFFF00',
+                'green': '#00FF00',
+                'cyan': '#00FFFF',
+                'magenta': '#FF00FF',
+                'blue': '#0000FF',
+                'red': '#FF0000',
+                'darkyellow': '#808000',
+                'darkgreen': '#008000',
+                'darkcyan': '#008080',
+                'darkmagenta': '#800080',
+                'darkblue': '#000080',
+                'darkred': '#800000',
+                'black': '#000000',
+                'white': '#FFFFFF',
+                'darkgray': '#808080',
+                'lightgray': '#C0C0C0',
+            }
+            hex_color = color_map.get(val.lower(), f'#{val}' if len(val) == 6 else '#FFFF00')
+            styles.append(f'background-color:{hex_color}')
+
     # 字体大小
     sz_elem = rPr.find(f'{{{W}}}sz')
     szCs_elem = rPr.find(f'{{{W}}}szCs')

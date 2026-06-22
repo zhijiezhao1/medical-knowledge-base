@@ -403,6 +403,10 @@ body {
   word-wrap: break-word;
   word-break: break-word;
 }
+.doc-body-content span,
+.doc-body-content p {
+  font-size: inherit !important;
+}
 .doc-body-content p { margin-bottom: 0.5em; }
 .doc-body-content table {
   border: 1px solid #000;
