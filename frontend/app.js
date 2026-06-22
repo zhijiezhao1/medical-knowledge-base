@@ -247,6 +247,7 @@
         const marks = container.querySelectorAll('mark.search-highlight');
         state.totalMatches = marks.length;
         state.currentMatch = 0;
+        console.log('[loadDocContent] totalMatches:', marks.length, 'keyword:', state.activeSearchKeyword);
         addPositionControls(container, id);
         // 初始定位到唯一的匹配项
         if (state.totalMatches === 1) {
@@ -303,6 +304,7 @@
 
   function scrollToMatch(container, dir) {
     const marks = container.querySelectorAll('mark.search-highlight');
+    console.log('[scrollToMatch] marks:', marks.length, 'dir:', dir, 'total:', state.totalMatches);
     if (marks.length === 0 || state.totalMatches <= 0) return;
     // 边界处理
     if (dir !== 0 && state.totalMatches === 1) return; // 只有一个匹配时不响应上下翻页
