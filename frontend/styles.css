@@ -396,7 +396,7 @@ body {
 /* ---- Document Content Rendering ---- */
 /* 这里是格式保留的核心：原样显示 Word 导出的 HTML */
 .doc-body-content {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.7;
   color: var(--text-primary);
   white-space: pre-wrap;
