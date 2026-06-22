@@ -251,8 +251,9 @@
         console.log('[loadDocContent] totalMatches:', marks.length, 'keyword:', state.activeSearchKeyword);
         addPositionControls(container, id);
         // 初始定位到唯一的匹配项
-        if (state.totalMatches === 1) {
-          setTimeout(() => scrollToMatch(container, 0), 100);
+        if (state.totalMatches === 1 && marks[0]) {
+          marks[0].classList.add('focused');
+          marks[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }
     } catch (e) {
@@ -309,6 +310,16 @@
     if (marks.length === 0 || state.totalMatches <= 0) return;
     // 边界处理
     if (dir !== 0 && state.totalMatches === 1) return; // 只有一个匹配时不响应上下翻页
+    // 当只有一个匹配时，直接定位到该位置
+    if (state.totalMatches === 1 && dir === 0) {
+      if (marks[0]) {
+        marks[0].classList.add('focused');
+        requestAnimationFrame(() => {
+          marks[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
+      return;
+    }
     state.currentMatch = Math.max(0, Math.min(state.totalMatches - 1, state.currentMatch + dir));
     marks.forEach(m => m.classList.remove('focused'));
     if (marks[state.currentMatch]) {
