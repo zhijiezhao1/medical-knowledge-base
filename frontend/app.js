@@ -556,6 +556,9 @@
 
   // ========== 事件绑定 ==========
   function bindEvents() {
+    // 阻止双击缩放
+    document.addEventListener("dblclick", (e) => e.preventDefault());
+
     // 上传区点击
     $('#uploadZone').onclick = () => { if (!state.uploading) $('#fileInput').click(); };
 
