@@ -6,7 +6,9 @@ import sqlite3
 import os
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'knowledge_base.db')
+# 数据目录：从环境变量读取，默认为后端目录
+DATA_DIR = os.environ.get('DATA_DIR', os.path.join(os.path.dirname(__file__)))
+DB_PATH = os.path.join(DATA_DIR, 'knowledge_base.db')
 
 
 def get_connection():
@@ -18,6 +20,9 @@ def get_connection():
 
 def init_db():
     """初始化数据库：创建主表 + FTS5 全文索引虚拟表 + 触发器"""
+    # 确保数据目录存在
+    os.makedirs(DATA_DIR, exist_ok=True)
+    
     conn = get_connection()
     cursor = conn.cursor()
 

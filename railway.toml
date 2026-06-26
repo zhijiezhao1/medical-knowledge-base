@@ -5,3 +5,8 @@
   restartPolicyType = "ON_FAILURE"
   restartPolicyMaxRetries = 10
   startCommand = "bash start.sh"
+
+# Railway 持久化存储配置
+# 创建一个 200MB 的持久化卷，挂载到 /data
+[volumes]
+  data = {MountPath = "/data"}

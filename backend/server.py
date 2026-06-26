@@ -21,7 +21,16 @@ from doc_parser import parse_file
 # ========== 配置 ==========
 HOST = '0.0.0.0'
 PORT = int(os.environ.get('PORT', 8080))
-UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
+
+# 数据目录：从环境变量读取（Railway 持久化存储挂载点）
+# 本地开发默认使用项目根目录，Railway 部署使用 /data
+DATA_DIR = os.environ.get('DATA_DIR', os.path.join(os.path.dirname(os.path.dirname(__file__))))
+
+# 数据库路径和上传目录路径
+DB_DIR = DATA_DIR  # 与 database.py 共享同一个数据目录
+UPLOAD_DIR = os.environ.get('UPLOAD_DIR', os.path.join(DATA_DIR, 'uploads'))
+
+# 前端目录（始终在项目内，不参与持久化）
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend')
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -343,6 +352,7 @@ def run():
 ╠═══════════════════════════════════════════════════╣
 ║  访问地址:  http://{HOST}:{PORT}                    ║
 ║  API 文档:  http://{HOST}:{PORT}/api/documents      ║
+║  数据目录:  {DATA_DIR}                    ║
 ║  上传目录:  {UPLOAD_DIR}                    ║
 ║  按 Ctrl+C 停止服务                                ║
 ╚═══════════════════════════════════════════════════╝
