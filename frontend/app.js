@@ -7,7 +7,8 @@
   console.log('app.js loaded v26');
 
   // ========== 配置 ==========
-  const API = 'https://medical-production-84ec.up.railway.app/api';
+  // 用相对路径，让前端跟着当前域名走（避免硬编码 Railway 域名导致迁移服务时失效）
+  const API = '/api';
   const DEBOUNCE_MS = 500;
   const MAX_FILE_SIZE = 50 * 1024 * 1024;
   const CORRECT_PASSWORD = 'zhishiku';
