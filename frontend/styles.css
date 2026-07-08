@@ -413,17 +413,133 @@ body {
 }
 .doc-body-content p { margin-bottom: 0.5em; }
 .doc-body-content table {
-  border: 1px solid #000;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   width: 100%;
   margin: 8px 0;
-  table-layout: fixed;
+  table-layout: auto;
 }
 .doc-body-content td,
 .doc-body-content th {
-  border: 1px solid #000;
-  padding: 6px 10px;
-  white-space: normal;
+  border: 1px solid #cbd5e1;
+  padding: 7px 8px;
+  vertical-align: middle;
+  background: white;
+  /* 智能换行：中文不断字、优先在标点/中英边界换行 */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+  min-width: 72px;
+}
+.doc-body-content th {
+  background: #f8fafc;
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 56px;
+  text-align: center;
+  color: var(--text-primary);
+}
+.doc-body-content td {
+  text-align: center;
+}
+.doc-body-content td:first-child,
+.doc-body-content th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: white;
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-primary);
+  min-width: 104px;
+  max-width: 104px;
+  box-shadow: 2px 0 6px -2px rgba(0,0,0,0.10);
+  border-right: 1.5px solid #94a3b8;
+}
+.doc-body-content thead th:first-child {
+  background: #f1f5f9;
+  z-index: 3;
+}
+.doc-body-content tr:nth-child(even) td:not(:first-child),
+.doc-body-content tr:nth-child(even) th:not(:first-child) {
+  background: #fafbfc;
+}
+
+/* ---- Table Scroll Wrapper (mobile-friendly horizontal scroll) ---- */
+/* .doc-table-scroll 由 app.js 自动包裹 doc-body-content 内的 <table> */
+.doc-table-scroll {
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 6px;
+  margin: 8px 0;
+  background: white;
+}
+.doc-table-scroll::-webkit-scrollbar { height: 5px; }
+.doc-table-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+.doc-table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+.doc-table-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+/* 横向滚动时首列右侧加阴影，与滑动列视觉分隔 */
+.doc-table-scroll .doc-body-content td:first-child,
+.doc-table-scroll .doc-body-content th:first-child {
+  box-shadow: 3px 0 8px -2px rgba(0,0,0,0.12);
+}
+/* 右侧渐变阴影：提示"右边还有内容"（仅当表格宽度超过容器时显示） */
+.doc-table-scroll.has-overflow::after {
+  content: "";
+  position: sticky;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 100%;
+  margin-left: -28px;
+  background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.95));
+  pointer-events: none;
+}
+/* 表格内联提示（在表头上方，非浮层） */
+.doc-table-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 0 0 9px;
+  letter-spacing: 0.02em;
+  background: transparent;
+}
+.doc-table-hint svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+.doc-table-hint.is-hidden {
+  display: none;
+}
+
+/* ---- Mobile Table Tweaks ---- */
+@media (max-width: 768px) {
+  .doc-body-content table {
+    min-width: 560px;
+    font-size: 14px;
+  }
+  .doc-body-content td,
+  .doc-body-content th {
+    padding: 6px 6px;
+    font-size: 13px;
+    min-width: 64px;
+  }
+  .doc-body-content th {
+    font-size: 12px;
+    min-width: 56px;
+  }
+  .doc-body-content td:first-child,
+  .doc-body-content th:first-child {
+    min-width: 100px;
+    max-width: 100px;
+    font-size: 12.5px;
+  }
 }
 /* 搜索关键词高亮 */
 mark.search-highlight {

@@ -4,7 +4,7 @@
 
 (function() {
   'use strict';
-  console.log('app.js loaded v27');
+  console.log('app.js loaded v28');
 
   // ========== 配置 ==========
   // 用相对路径，让前端跟着当前域名走（避免硬编码 Railway 域名导致迁移服务时失效）
@@ -243,6 +243,8 @@
       const data = await api.getDoc(id);
       const html = data.html_content || '<p style="color:var(--text-muted)">文档内容为空</p>';
       container.innerHTML = '<div class="doc-body-content">' + html + '</div>';
+      // 把文档里的 <table> 包到横向滚动容器里，加内联提示
+      enhanceTables(container);
       console.log('[loadDocContent] activeSearchKeyword:', state.activeSearchKeyword, 'length:', state.activeSearchKeyword?.length);
       if (state.activeSearchKeyword) {
         highlightKeyword(container, state.activeSearchKeyword);
@@ -263,6 +265,66 @@
     } catch (e) {
       container.innerHTML = '<p style="color:var(--error)">加载失败</p>';
     }
+  }
+
+  // ========== 表格增强：横向滚动容器 + 内联提示 ==========
+  // 把容器内所有未包装的 <table> 包到 .doc-table-scroll 里，
+  // 并在表头上方插入"左右滑动"提示（自动检测是否需要滚动 + 自动隐藏）
+  const TABLE_HINT_KEY = 'kb_table_hint_seen';
+  function enhanceTables(container) {
+    const tables = container.querySelectorAll(':scope > .doc-body-content table, .doc-body-content table');
+    tables.forEach(table => {
+      // 跳过已经被包过的表格
+      if (table.parentElement && table.parentElement.classList.contains('doc-table-scroll')) return;
+      // 跳过 doc-body-content 之外的（比如嵌套在其他结构里的）—— 只包顶层表格
+      let parent = table.parentElement;
+      // 找到最近的 doc-body-content 祖先
+      const docBody = table.closest('.doc-body-content');
+      if (!docBody) return;
+      // 如果 table 的直接父节点不是 doc-body-content，跳过（避免破坏嵌套结构）
+      if (table.parentElement !== docBody) return;
+
+      // 建滚动容器 + 提示
+      const wrapper = document.createElement('div');
+      wrapper.className = 'doc-table-scroll';
+
+      const hint = document.createElement('div');
+      hint.className = 'doc-table-hint';
+      hint.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>' +
+        '<span>左右滑动查看完整表格</span>' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>';
+
+      // sessionStorage 记忆：用户已见过提示就默认隐藏
+      try {
+        if (sessionStorage.getItem(TABLE_HINT_KEY) === '1') {
+          hint.classList.add('is-hidden');
+        }
+      } catch (e) { /* sessionStorage 不可用时忽略 */ }
+
+      // 插入包装
+      table.parentNode.insertBefore(wrapper, table);
+      wrapper.appendChild(hint);
+      wrapper.appendChild(table);
+
+      // 检测是否真的需要滚动 + 注册首次滚动自动隐藏
+      requestAnimationFrame(() => {
+        const needsScroll = wrapper.scrollWidth > wrapper.clientWidth + 2;
+        if (needsScroll) {
+          wrapper.classList.add('has-overflow');
+          let hidden = hint.classList.contains('is-hidden');
+          wrapper.addEventListener('scroll', () => {
+            if (!hidden) {
+              hidden = true;
+              hint.classList.add('is-hidden');
+              try { sessionStorage.setItem(TABLE_HINT_KEY, '1'); } catch (e) {}
+            }
+          }, { once: true, passive: true });
+        } else {
+          // 表格能完全放下，不需要提示
+          hint.classList.add('is-hidden');
+        }
+      });
+    });
   }
 
   // ========== 关键词高亮 ==========
