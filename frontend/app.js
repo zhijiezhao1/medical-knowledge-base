@@ -4,7 +4,7 @@
 
 (function() {
   'use strict';
-  console.log('app.js loaded v26');
+  console.log('app.js loaded v27');
 
   // ========== 配置 ==========
   // 用相对路径，让前端跟着当前域名走（避免硬编码 Railway 域名导致迁移服务时失效）
@@ -251,10 +251,13 @@
         state.currentMatch = 0;
         console.log('[loadDocContent] totalMatches:', marks.length, 'keyword:', state.activeSearchKeyword);
         addPositionControls(container, id);
-        // 初始定位到唯一的匹配项
-        if (state.totalMatches === 1 && marks[0]) {
+        // 初始定位到第一个匹配项（不论匹配多少处，都自动滚到第一处）
+        if (marks.length > 0) {
+          marks.forEach(m => m.classList.remove('focused'));
           marks[0].classList.add('focused');
-          marks[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          requestAnimationFrame(() => {
+            marks[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
         }
       }
     } catch (e) {
@@ -266,6 +269,13 @@
   function highlightKeyword(container, keyword) {
     const kw = keyword || state.activeSearchKeyword;
     if (!kw) return;
+    // 先清除已有的高亮（避免重复高亮，让函数变成幂等）
+    const existingMarks = container.querySelectorAll('mark.search-highlight');
+    existingMarks.forEach(mark => {
+      const textNode = document.createTextNode(mark.textContent);
+      mark.parentNode.replaceChild(textNode, mark);
+    });
+    container.normalize();
     const esc = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
     const textNodes = [];
@@ -289,6 +299,42 @@
       if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
       if (frag.childNodes.length > 0) node.parentNode.replaceChild(frag, node);
     });
+  }
+
+  // ========== 滚动到文档第一个匹配项 ==========
+  // 兼容两种情况：文档正在异步加载 / 文档已经加载过（但高亮可能过时）
+  function scrollDocToFirstMatch(docId) {
+    let attempts = 0;
+    const tick = () => {
+      attempts++;
+      const wrapper = document.getElementById('body-' + docId);
+      if (!wrapper) {
+        if (attempts < 40) setTimeout(tick, 100); // 最多等 ~4 秒
+        return;
+      }
+      // 文档还在加载中（loadDocContent 异步 fetch）
+      if (wrapper.dataset.loaded !== '1') {
+        if (attempts < 40) setTimeout(tick, 100);
+        return;
+      }
+      // 检查或重新应用高亮
+      let marks = wrapper.querySelectorAll('mark.search-highlight');
+      if (marks.length === 0 && state.activeSearchKeyword) {
+        highlightKeyword(wrapper, state.activeSearchKeyword);
+        marks = wrapper.querySelectorAll('mark.search-highlight');
+        state.totalMatches = marks.length;
+        addPositionControls(wrapper, docId);
+      }
+      if (marks.length === 0) return;
+      // 滚动到第一个匹配项
+      state.currentMatch = 0;
+      marks.forEach(m => m.classList.remove('focused'));
+      marks[0].classList.add('focused');
+      requestAnimationFrame(() => {
+        marks[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    };
+    tick();
   }
 
   // ========== 定位控件 ==========
@@ -411,10 +457,8 @@
         $('#searchResults').innerHTML = '';
         $('#searchCount').textContent = '';
         render();
-        setTimeout(() => {
-          const card = $('doc-' + id);
-          if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+        // 滚动到该文档的第一个匹配项（处理文档正在加载或已加载两种情况）
+        scrollDocToFirstMatch(id);
       };
     });
   }
