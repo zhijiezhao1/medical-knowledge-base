@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>表格浏览体验优化 · 设计稿预览</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --line: #e9e3d6;
+  --line-soft: #f0ebe0;
+  --text: #14171e;
+  --text-muted: #7c7a72;
+  --text-dim: #a8a59c;
+  --primary: #2f6f5e;
+  --primary-soft: rgba(47, 111, 94, 0.08);
+  --warn: #c97b3f;
+  --shadow-soft: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px -2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px -2px rgba(0,0,0,0.10);
+  --shadow-phone: 0 20px 50px -8px rgba(20, 23, 30, 0.25), 0 0 0 12px #1a1d24, 0 0 0 14px #2a2d34;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+/* Subtle background grain */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 12% 8%, rgba(47, 111, 94, 0.04) 0%, transparent 50%),
+              radial-gradient(circle at 88% 92%, rgba(201, 123, 63, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+.wrap { max-width: 1280px; margin: 0 auto; padding: 64px 32px 80px; position: relative; z-index: 1; }
+
+/* ===== Hero ===== */
+.hero { margin-bottom: 64px; }
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 20px;
+}
+.eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+.lede {
+  font-size: 17px;
+  color: var(--text-muted);
+  max-width: 640px;
+  line-height: 1.6;
+}
+
+/* ===== Section header ===== */
+.section-head { margin: 56px 0 28px; display: flex; align-items: baseline; gap: 16px; }
+.section-head h2 {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: -0.005em;
+}
+.section-head .sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.section-head .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-left: 8px;
+}
+.badge.before { background: rgba(201, 123, 63, 0.12); color: var(--warn); }
+.badge.after { background: var(--primary-soft); color: var(--primary); }
+
+/* ===== Phone grid ===== */
+.phone-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-bottom: 40px;
+}
+@media (max-width: 1024px) {
+  .phone-grid { grid-template-columns: 1fr; gap: 40px; max-width: 420px; margin: 0 auto 40px; }
+}
+
+/* ===== Phone ===== */
+.phone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.phone-label {
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.phone-label .tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.phone-label .tag.bad { background: rgba(201, 123, 63, 0.15); color: var(--warn); }
+.phone-label .tag.good { background: var(--primary-soft); color: var(--primary); }
+.phone-frame {
+  width: 360px;
+  height: 720px;
+  border-radius: 44px;
+  background: #0a0c10;
+  padding: 12px;
+  box-shadow: var(--shadow-lg), inset 0 0 0 1px rgba(255,255,255,0.06);
+  position: relative;
+}
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  background: #f1f5f9;
+  border-radius: 32px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+/* Notch */
+.phone-screen::before {
+  content: "";
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 110px; height: 26px;
+  background: #0a0c10;
+  border-radius: 999px;
+  z-index: 50;
+}
+/* Status bar */
+.status-bar {
+  height: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 28px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  flex-shrink: 0;
+}
+.status-bar .right { display: flex; gap: 5px; align-items: center; }
+.status-bar svg { width: 14px; height: 14px; }
+
+/* App nav */
+.app-nav {
+  height: 52px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.app-logo {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 600;
+}
+.app-logo svg { color: #2563eb; }
+.app-search-mini {
+  flex: 1;
+  height: 32px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 12px;
+  color: #94a3b8;
+  gap: 6px;
+}
+.app-search-mini svg { width: 12px; height: 12px; }
+.app-upload {
+  width: 32px; height: 32px;
+  background: #2563eb;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.app-upload svg { width: 14px; height: 14px; }
+
+/* Page content */
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  background: #f8fafc;
+  padding: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.doc-card {
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.doc-head {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.doc-icon-mini { color: #3b82f6; flex-shrink: 0; }
+.doc-title-mini {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.doc-chevron {
+  color: #64748b;
+  transform: rotate(180deg);
+}
+.doc-body-section {
+  padding: 10px 14px 14px;
+}
+.doc-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+/* ===== Tables ===== */
+.tbl-wrap {
+  /* Used in NEW design: scrollable wrapper */
+  position: relative;
+  border-radius: 6px;
+}
+.tbl-wrap-old {
+  /* Used in OLD design: no scroll, just cramped */
+}
+.tbl-new {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: 580px; /* Force horizontal scroll on mobile */
+  background: white;
+  font-size: 13px;
+  table-layout: auto;
+}
+.tbl-new th, .tbl-new td {
+  border: 1px solid #cbd5e1;
+  padding: 7px 8px;
+  text-align: center;
+  vertical-align: middle;
+  background: white;
+  min-width: 72px;
+  /* Smart wrapping - keeps CJK words together, allows breaking at boundaries */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+.tbl-new th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #0f172a;
+  min-width: 56px;
+  font-size: 12px;
+}
+.tbl-new td:first-child, .tbl-new th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  text-align: left;
+  background: white;
+  font-weight: 500;
+  color: #0f172a;
+  min-width: 104px;
+  max-width: 104px;
+  box-shadow: 2px 0 6px -2px rgba(0,0,0,0.10);
+  border-right: 1.5px solid #94a3b8;
+}
+.tbl-new thead th:first-child {
+  background: #f1f5f9;
+  z-index: 3;
+}
+.tbl-new tbody tr:first-child th:first-child {
+  /* top-left corner cell */
+}
+.tbl-new tr:nth-child(even) td:not(:first-child),
+.tbl-new tr:nth-child(even) th:not(:first-child) {
+  background: #fafbfc;
+}
+
+/* Inline hint above table (replaces floating overlay) */
+.tbl-inline-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  padding: 0 0 9px;
+  letter-spacing: 0.02em;
+}
+.tbl-inline-hint svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.65;
+}
+.tbl-inline-hint.is-hidden { display: none; }
+
+/* Auto-hide label (for Phone 3 to show what happened to the hint) */
+.auto-hide-tag {
+  font-size: 10.5px;
+  color: #94a3b8;
+  text-align: center;
+  padding: 0 0 9px;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.auto-hide-tag svg {
+  width: 11px;
+  height: 11px;
+  opacity: 0.7;
+}
+
+/* Smart-wrap highlight (for demo emphasis on Phone 2) */
+.smart-wrap-demo {
+  position: relative;
+}
+.smart-wrap-demo::before {
+  content: "✓ 智能换行";
+  position: absolute;
+  top: -22px;
+  left: 0;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #2f6f5e;
+  background: rgba(47, 111, 94, 0.10);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 5;
+}
+
+/* Scrollable wrapper with fade hint */
+.tbl-scroller {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 6px;
+  position: relative;
+  scrollbar-width: thin;
+}
+.tbl-scroller::-webkit-scrollbar { height: 4px; }
+.tbl-scroller::-webkit-scrollbar-track { background: #f1f5f9; }
+.tbl-scroller::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+
+/* Fade hint on right edge */
+.tbl-wrap-fade::after {
+  content: "";
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 32px;
+  background: linear-gradient(to right, transparent, rgba(248, 250, 252, 0.95));
+  pointer-events: none;
+  border-radius: 0 6px 6px 0;
+  z-index: 4;
+}
+
+/* ===== OLD TABLE (current broken state) ===== */
+.tbl-old {
+  border-collapse: collapse;
+  width: 100%;
+  background: white;
+  table-layout: fixed;
+  font-size: 11px;
+}
+.tbl-old th, .tbl-old td {
+  border: 1px solid #000;
+  padding: 4px 2px;
+  text-align: center;
+  vertical-align: middle;
+  word-break: break-all;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+.tbl-old th {
+  background: #f8fafc;
+  font-weight: 600;
+  font-size: 10px;
+  color: #0f172a;
+}
+.tbl-old td:first-child, .tbl-old th:first-child {
+  text-align: left;
+  background: #f8fafc;
+  font-weight: 500;
+}
+.tbl-old td mark {
+  background: #FFE066;
+  color: #1A1A1A;
+  padding: 1px 2px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Annotation tags */
+.tag-3d { background: #FFE066; color: #1A1A1A; padding: 0 3px; border-radius: 2px; font-weight: 600; }
+
+/* Floating nav buttons */
+.floating-nav {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 30;
+}
+.float-btn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #64748b;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* ===== Features grid ===== */
+.features {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin: 32px 0 56px;
+}
+@media (max-width: 900px) { .features { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px) { .features { grid-template-columns: 1fr; } }
+.feature {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow-soft);
+}
+.feature-icon {
+  width: 36px; height: 36px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.feature-icon svg { width: 18px; height: 18px; }
+.feature-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.feature-desc {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ===== Inline annotations inside phone ===== */
+.callout {
+  position: absolute;
+  background: var(--text);
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 60;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.callout::before {
+  content: "";
+  position: absolute;
+  width: 0; height: 0;
+  border: 5px solid transparent;
+}
+.callout-down::before {
+  top: -10px; left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: var(--text);
+}
+.callout-down { top: 12px; left: 50%; transform: translateX(-50%); }
+
+/* ===== PC demo row ===== */
+.pc-demo {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 24px;
+}
+.pc-demo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.pc-demo-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.pc-demo-header .note {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.pc-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-size: 13px;
+  background: white;
+}
+.pc-table th, .pc-table td {
+  border: 1px solid #cbd5e1;
+  padding: 8px 12px;
+  text-align: center;
+  vertical-align: middle;
+}
+.pc-table th {
+  background: #f8fafc;
+  font-weight: 600;
+}
+.pc-table td:first-child, .pc-table th:first-child {
+  text-align: left;
+  background: #f8fafc;
+  font-weight: 500;
+}
+
+/* ===== Footer note ===== */
+.note-box {
+  background: white;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 18px 22px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.note-box strong { color: var(--text); font-weight: 600; }
+
+/* Mock-accurate tables - using real MEWS data */
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="eyebrow"><span class="eyebrow-dot"></span>设计预览 · Mobile Table UX</div>
+    <h1>表格在手机上<br>应该怎么读？</h1>
+    <p class="lede">针对医学参考表（多列、含数值范围）的手机端浏览体验。三张手机模拟对比，让你直接判断这个改造方向对不对。</p>
+  </div>
+
+  <!-- Phone grid -->
+  <div class="section-head">
+    <h2>对比预览</h2>
+    <span class="sub">三张 iPhone 14 Pro Max 模拟 · 实际宽度 360px</span>
+  </div>
+
+  <div class="phone-grid">
+
+    <!-- PHONE 1: CURRENT STATE -->
+    <div class="phone">
+      <div class="phone-label">改前 <span class="tag bad">现在的问题</span></div>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="right">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V2L2 22z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="18" height="10" rx="2"/><rect x="21" y="9" width="2" height="6" fill="#0f172a"/></svg>
+            </span>
+          </div>
+          <div class="app-nav">
+            <div class="app-logo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              医学知识库
+            </div>
+            <div class="app-search-mini">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              搜索…
+            </div>
+            <div class="app-upload">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            </div>
+          </div>
+          <div class="app-content">
+            <div class="doc-card">
+              <div class="doc-head">
+                <svg class="doc-icon-mini" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span class="doc-title-mini">第一部分 重症监测与患者评估</span>
+                <svg class="doc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="doc-body-section">
+                <div class="doc-section-title">(1) 改良早期预警评分（MEWS）</div>
+                <table class="tbl-old">
+                  <thead>
+                    <tr>
+                      <th>参数<br>项目</th>
+                      <th>3<br>分</th>
+                      <th>2<br>分</th>
+                      <th>1<br>分</th>
+                      <th>0<br>分</th>
+                      <th>1<br>分</th>
+                      <th>2<br>分</th>
+                      <th>3<br>分</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>心率（次/min）</td>
+                      <td></td>
+                      <td>≤40</td>
+                      <td>41-50</td>
+                      <td>51-100</td>
+                      <td>101-110</td>
+                      <td>111-129</td>
+                      <td>≥130</td>
+                    </tr>
+                    <tr>
+                      <td><mark>收缩压</mark>（mmHg）</td>
+                      <td>≤70</td>
+                      <td>71-80</td>
+                      <td>81-100</td>
+                      <td>101-199</td>
+                      <td></td>
+                      <td>≥200</td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>呼吸频率（次/min）</td>
+                      <td></td>
+                      <td>&lt;9</td>
+                      <td></td>
+                      <td>9-14</td>
+                      <td>15-20</td>
+                      <td>21-29</td>
+                      <td>≥30</td>
+                    </tr>
+                    <tr>
+                      <td>体温（℃）</td>
+                      <td></td>
+                      <td>&lt;35</td>
+                      <td></td>
+                      <td>35-38.4</td>
+                      <td>≥38.5</td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>意识</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td>清楚</td>
+                      <td>对声音有反应</td>
+                      <td>对疼痛有反应</td>
+                      <td>无反应</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHONE 2: NEW - INITIAL -->
+    <div class="phone">
+      <div class="phone-label">改后 <span class="tag good">初始位置</span></div>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="right">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V2L2 22z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="18" height="10" rx="2"/><rect x="21" y="9" width="2" height="6" fill="#0f172a"/></svg>
+            </span>
+          </div>
+          <div class="app-nav">
+            <div class="app-logo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              医学知识库
+            </div>
+            <div class="app-search-mini">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              搜索…
+            </div>
+            <div class="app-upload">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            </div>
+          </div>
+          <div class="app-content">
+            <div class="doc-card">
+              <div class="doc-head">
+                <svg class="doc-icon-mini" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span class="doc-title-mini">第一部分 重症监测与患者评估</span>
+                <svg class="doc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="doc-body-section">
+                <div class="doc-section-title">(1) 改良早期预警评分（MEWS）</div>
+                <div class="tbl-inline-hint">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                  左右滑动查看完整表格
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+                <div class="tbl-wrap tbl-wrap-fade">
+                  <div class="tbl-scroller">
+                    <table class="tbl-new">
+                      <thead>
+                        <tr>
+                          <th>参数项目</th>
+                          <th>3分</th>
+                          <th>2分</th>
+                          <th>1分</th>
+                          <th>0分</th>
+                          <th>1分</th>
+                          <th>2分</th>
+                          <th>3分</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>心率（次/min）</td>
+                          <td></td>
+                          <td>≤40</td>
+                          <td>41-50</td>
+                          <td>51-100</td>
+                          <td>101-110</td>
+                          <td>111-129</td>
+                          <td>≥130</td>
+                        </tr>
+                        <tr>
+                          <td>收缩压（mmHg）</td>
+                          <td>≤70</td>
+                          <td>71-80</td>
+                          <td>81-100</td>
+                          <td>101-199</td>
+                          <td></td>
+                          <td>≥200</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td class="smart-wrap-demo">呼吸频率（次/min）</td>
+                          <td></td>
+                          <td>&lt;9</td>
+                          <td></td>
+                          <td>9-14</td>
+                          <td>15-20</td>
+                          <td>21-29</td>
+                          <td>≥30</td>
+                        </tr>
+                        <tr>
+                          <td>体温（℃）</td>
+                          <td></td>
+                          <td>&lt;35</td>
+                          <td></td>
+                          <td>35-38.4</td>
+                          <td>≥38.5</td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td>意识</td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td>清楚</td>
+                          <td>对声音有反应</td>
+                          <td>对疼痛有反应</td>
+                          <td>无反应</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone">
+      <div class="phone-label">改后 <span class="tag good">向右滑动后</span></div>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="right">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V2L2 22z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="18" height="10" rx="2"/><rect x="21" y="9" width="2" height="6" fill="#0f172a"/></svg>
+            </span>
+          </div>
+          <div class="app-nav">
+            <div class="app-logo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              医学知识库
+            </div>
+            <div class="app-search-mini">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              收缩压
+            </div>
+            <div class="app-upload">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            </div>
+          </div>
+          <div class="app-content">
+            <div class="doc-card">
+              <div class="doc-head">
+                <svg class="doc-icon-mini" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span class="doc-title-mini">第一部分 重症监测与患者评估</span>
+                <svg class="doc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="doc-body-section">
+                <div class="doc-section-title">(1) 改良早期预警评分（MEWS）</div>
+                <div class="auto-hide-tag">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  滑动提示已自动隐藏（sessionStorage 记录"已见过"）
+                </div>
+                <div class="tbl-wrap">
+                  <div class="tbl-scroller" style="overflow-x: hidden;">
+                    <!-- Hack to simulate scroll: put table in wider container shifted left -->
+                    <div style="margin-left: -130px;">
+                      <table class="tbl-new">
+                        <thead>
+                          <tr>
+                            <th>参数项目</th>
+                            <th>3分</th>
+                            <th>2分</th>
+                            <th>1分</th>
+                            <th>0分</th>
+                            <th>1分</th>
+                            <th>2分</th>
+                            <th>3分</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>心率（次/min）</td>
+                            <td></td>
+                            <td>≤40</td>
+                            <td>41-50</td>
+                            <td>51-100</td>
+                            <td>101-110</td>
+                            <td>111-129</td>
+                            <td>≥130</td>
+                          </tr>
+                          <tr>
+                            <td>收缩压（mmHg）</td>
+                            <td>≤70</td>
+                            <td>71-80</td>
+                            <td>81-100</td>
+                            <td>101-199</td>
+                            <td></td>
+                            <td>≥200</td>
+                            <td></td>
+                          </tr>
+                          <tr>
+                            <td>呼吸频率（次/min）</td>
+                            <td></td>
+                            <td>&lt;9</td>
+                            <td></td>
+                            <td>9-14</td>
+                            <td>15-20</td>
+                            <td>21-29</td>
+                            <td>≥30</td>
+                          </tr>
+                          <tr>
+                            <td>体温（℃）</td>
+                            <td></td>
+                            <td>&lt;35</td>
+                            <td></td>
+                            <td>35-38.4</td>
+                            <td>≥38.5</td>
+                            <td></td>
+                            <td></td>
+                          </tr>
+                          <tr>
+                            <td>意识</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>清楚</td>
+                            <td>对声音有反应</td>
+                            <td>对疼痛有反应</td>
+                            <td>无反应</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="floating-nav">
+            <div class="float-btn">↑ 上一处 (1/12)</div>
+            <div class="float-btn">下一处 (2/12) ↓</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section-head">
+    <h2>四个设计要点</h2>
+    <span class="sub">纯 CSS，零 JS</span>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+      </div>
+      <div class="feature-title">横向滚动</div>
+      <div class="feature-desc">表格整体最小宽度 580px，窄屏时整张表横向滑动，不挤压、不换行。</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      </div>
+      <div class="feature-title">首列吸顶</div>
+      <div class="feature-desc">参数列（心率/收缩压/呼吸频率）滚动时始终贴在屏幕左边，永远看得见。</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="feature-title">智能换行</div>
+      <div class="feature-desc"><code>word-break: keep-all</code> + <code>line-break: strict</code>，让"呼吸频率"自动换到"（次/min）"，不在括号后断、不单字成行。</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="feature-title">内联提示</div>
+      <div class="feature-desc">提示放在表头上方（不浮层），用户横向滑动一次后自动隐藏，不再骚扰。sessionStorage 记录"已见过"。</div>
+    </div>
+  </div>
+
+  <!-- PC demo -->
+  <div class="section-head">
+    <h2>PC 端不受影响</h2>
+    <span class="sub">只在 ≤768px 启用，桌面端完全保持原样</span>
+  </div>
+
+  <div class="pc-demo">
+    <div class="pc-demo-header">
+      <h3>桌面端表格展示（≥769px）</h3>
+      <span class="note">横向填满容器，无滚动条</span>
+    </div>
+    <table class="pc-table">
+      <thead>
+        <tr>
+          <th>参数项目</th>
+          <th>3分</th>
+          <th>2分</th>
+          <th>1分</th>
+          <th>0分</th>
+          <th>1分</th>
+          <th>2分</th>
+          <th>3分</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>心率（次/min）</td>
+          <td></td>
+          <td>≤40</td>
+          <td>41-50</td>
+          <td>51-100</td>
+          <td>101-110</td>
+          <td>111-129</td>
+          <td>≥130</td>
+        </tr>
+        <tr>
+          <td>收缩压（mmHg）</td>
+          <td>≤70</td>
+          <td>71-80</td>
+          <td>81-100</td>
+          <td>101-199</td>
+          <td></td>
+          <td>≥200</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>呼吸频率（次/min）</td>
+          <td></td>
+          <td>&lt;9</td>
+          <td></td>
+          <td>9-14</td>
+          <td>15-20</td>
+          <td>21-29</td>
+          <td>≥30</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note-box">
+    <strong>改造范围：</strong><code>styles.css</code> + <code>app.js</code>（约 20 行 JS：自动给表格包滚动容器 + 加内联提示）。不动 HTML、不动后端。所有 docx/rtf/txt 文档里的表格自动受益。<br>
+    <strong>工作量：</strong>~30 行 CSS + ~20 行 JS，15 分钟。<br>
+    <strong>兼容性：</strong>sticky/overflow/line-break 是 2017 年后的标准，主流浏览器全部支持。<br>
+    <strong>提示的"自动隐藏"机制：</strong>表格渲染后检测 <code>scrollWidth &gt; clientWidth</code>，需要滚动才显示提示；用户第一次滑动表格后即隐藏，sessionStorage 记录"已见过"。
+  </div>
+
+</div>
+</body>
+</html>
