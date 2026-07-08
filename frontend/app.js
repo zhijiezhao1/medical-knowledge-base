@@ -4,7 +4,7 @@
 
 (function() {
   'use strict';
-  console.log('app.js loaded v28');
+  console.log('app.js loaded v29');
 
   // ========== 配置 ==========
   // 用相对路径，让前端跟着当前域名走（避免硬编码 Railway 域名导致迁移服务时失效）
@@ -553,15 +553,39 @@
   }
 
   function closeSearch() {
+    clearAllSearch();
+    state.searchOpen = false;
+    $('#pageContent').style.paddingTop = '';
+    if ($('#searchPanel')) $('#searchPanel').style.display = 'none';
+  }
+
+  // 完全重置搜索状态：清输入框、搜索结果、文档高亮、定位控件
+  // 被 closeSearch 和输入框清空时复用
+  function clearAllSearch() {
+    // 让进行中的请求响应被识别为 stale
+    state.searchRequestId++;
+    // 重置状态
+    state.activeSearchKeyword = '';
     state.searchKeyword = '';
     state.searchResults = [];
+    state.searchLoading = false;
+    state.currentMatch = 0;
+    state.totalMatches = 0;
+    // 清输入框 + 搜索结果 UI
     if ($('#searchInput')) $('#searchInput').value = '';
     if ($('#navSearch')) $('#navSearch').value = '';
     if ($('#searchResults')) $('#searchResults').innerHTML = '';
     if ($('#searchCount')) $('#searchCount').textContent = '';
-    state.searchOpen = false;
-    $('#pageContent').style.paddingTop = '';
-    if ($('#searchPanel')) $('#searchPanel').style.display = 'none';
+    // 移除所有文档里的高亮 mark（恢复原文）
+    document.querySelectorAll('mark.search-highlight').forEach(mark => {
+      const textNode = document.createTextNode(mark.textContent);
+      mark.parentNode.replaceChild(textNode, mark);
+    });
+    document.querySelectorAll('.doc-body-content').forEach(body => {
+      body.normalize(); // 合并相邻文本节点，避免碎片化
+    });
+    // 移除所有定位控件（↑/↓）
+    document.querySelectorAll('.position-controls').forEach(el => el.remove());
   }
 
   // ========== 渲染 ==========
@@ -716,10 +740,8 @@
       if (kw.trim()) {
         doSearch(kw);
       } else {
-        state.activeSearchKeyword = '';
-        state.searchResults = [];
-        $('#searchResults').innerHTML = '';
-        $('#searchCount').textContent = '';
+        // 输入框清空：完全重置搜索（移除高亮、定位控件等）
+        clearAllSearch();
       }
     };
 
@@ -730,10 +752,7 @@
       if (kw.trim()) {
         doSearch(kw);
       } else {
-        state.activeSearchKeyword = '';
-        state.searchResults = [];
-        $('#searchResults').innerHTML = '';
-        $('#searchCount').textContent = '';
+        clearAllSearch();
       }
     };
 
